@@ -7,19 +7,25 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { TextField } from '@mui/material';
 
+import { useSnackbar } from 'notistack';
+import { EditLISTS } from '../slice/loadWishListss';
+import {  useDispatch } from 'react-redux'
+
 import axios from 'axios';
 import ModeIcon from '@mui/icons-material/Mode';
 
 export default function EditWishList(props) {
-
+  const base64String = btoa(String.fromCharCode(...new Uint8Array(props.word.photo.data.data)));
     const valueRef = React.useRef('')
     
     const [itemName, setitemName] = React.useState(props.word.item_name);
-    const [file, setFile] = React.useState(props.word.photo.data.data.toString('base64'));
+    const [file, setFile] = React.useState(base64String);
     const [brandName, setBrandName] = React.useState(props.word.brand_name);
     const [open, setOpen] = React.useState(false);
+    const [changeFile, setChangeFile] = React.useState('');
+    const {enqueueSnackbar}= useSnackbar()
     
-    
+    const dispatch = useDispatch()
     
     const handleClickOpen = () => {
         setOpen(true);
@@ -41,7 +47,8 @@ export default function EditWishList(props) {
     };
     const handleChangeFile=(e)=> {
         console.log(e.target.files);
-        setFile(URL.createObjectURL(e.target.files[0]));
+        setFile(e.target.files[0]);
+        setChangeFile('change');
     }
     const handleAdd = (e)=>{
       e.preventDefault();
@@ -49,15 +56,34 @@ export default function EditWishList(props) {
       formData.append('id',props.word._id);
       if(props.word.item_name!==itemName){
         formData.append('item_name',itemName);
+
       }
       if(props.word.brand_name!==brandName){
         formData.append('brand_name',brandName);
+      }
+      if(changeFile==='change'){
+        formData.append('file',file);
       }
       
       
       
       // formData.append('file',file);
-      axios.put("http://localhost:9000/editwishlist",formData ,{});
+      axios.put("http://localhost:9000/editwishlist",formData).then((response) => {
+      
+        dispatch(EditLISTS(response.data))
+        console.log("data is here",response.data)
+  
+        if(response.data._id){
+          const message = 'Success list edited';
+          enqueueSnackbar(message, { variant: 'success' })
+          }else{
+          const messageError = 'Error list not edited';
+          enqueueSnackbar(messageError, { variant: 'error' })
+        }
+  
+      }).catch(err => {
+        console.log(err);
+     });
       handleClose()
       console.log(...formData)
       
@@ -71,14 +97,14 @@ export default function EditWishList(props) {
     <Dialog disableEscapeKeyDown open={open} onClose={handleClose}>
         <DialogTitle sx={DialogStyle}>Edit wish list</DialogTitle>
         <DialogContent sx={DialogStyle}>
-            <form enctype="multipart/form-data">
+            <form  encType="multipart/form-data">
                 <p>Item name</p>
                 <TextField  sx={{background:'#ffff'}} name="item_name" inputRef={valueRef} value={itemName} onChange={handleChange}/>
                 <p>Brand name</p>
                 <TextField  sx={{background:'#ffff'}} name="brand_name" inputRef={valueRef} value={brandName} onChange={handleChangeBrandName}/>
                 <p>Upload image</p>
                 <input type="file" name="file" accept='image/*' onChange={handleChangeFile} />
-                <img  src={`data:image/png;base64,${file}`}/>
+                {changeFile===''?<img  src={`data:image/${props.word.photo.contentType};base64,${base64String}`}/>:<img src={URL.createObjectURL(file)}/>}
             </form> 
         </DialogContent>
         <DialogActions sx={DialogStyle} >

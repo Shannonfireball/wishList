@@ -1,13 +1,13 @@
 const WishList = require('../model/WishList');
-
-
+var fs = require('fs');
+var path = require('path');
 
 let multer = require('multer');
 
 const Storage = multer.diskStorage({
     destination:"uploads",
      filename:function (req, file, cb) {
-      cb(null, file.originalname)
+      cb(null, file.fieldname)
     },
   })
 const upload = multer({ storage: Storage }).single('testImage');
@@ -38,15 +38,16 @@ const handleAddList = async (request,response) => {
             "item_name": item_name,
             "brand_name":brand_name,
             "photo":{
-                data: image.file, // data: image.filename,
-                contentType:'image/jpg'
+                data: fs.readFileSync(path.join(__dirname ,'..', 'uploads', request.file.filename)), // data: image.filename,
+                contentType:request.file.mimetype
             }
         })
-        console.log(newList._id);
+        console.log(path.join(__dirname ,'..', 'uploads', request.file.filename))
         newList.save().then(()=>response.json({ 'list': newList })).catch(err=>console.log(err))
     }
     catch(error){      
         response.status(500).json({ "message": error.message });
+        console.log(request.file)
         
 
     }

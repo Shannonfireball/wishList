@@ -1,6 +1,6 @@
 const WishList = require('../model/WishList');
-
-
+var fs = require('fs');
+var path = require('path');
 
 const handleEditWishList = async (request,response)=>{
     try{
@@ -22,10 +22,10 @@ const handleEditWishList = async (request,response)=>{
     if(request.body?.brand_name){
         wishList.brand_name = request.body.brand_name;
     }
-    if(image?.file){
-        wishList.img.data = fs.readFileSync(path.join(__dirname + '/uploads/' + image.file)) 
-        console.log("HERE!! : ", path.join(__dirname + '/uploads/' + image.file))           
-        wishList.img.contentType = 'image/jpg';
+    if(request?.file){
+        wishList.photo.data = fs.readFileSync(path.join(__dirname ,'..', 'uploads', request.file.filename)) 
+        console.log(path.join(__dirname ,'..', 'uploads', request.file.filename))           
+        wishList.photo.contentType = request.file.mimetype;
     }
     
     const result = await wishList.save();

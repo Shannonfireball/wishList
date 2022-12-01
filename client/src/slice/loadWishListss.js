@@ -39,6 +39,10 @@ const sliceOptions = {
   reducers: {
     AddLISTS:(state,action)=>{
       state.words.push(action.payload)
+    },
+    EditLISTS:(state,action)=>{
+      state.words = state.words.filter((word)=>word._id!==action.payload._id);
+      state.words.push(action.payload)
     }
   },
   extraReducers: {
@@ -60,7 +64,7 @@ const sliceOptions = {
 
 export const allWishListsSlice = createSlice(sliceOptions);
 
-export const { AddLISTS } = allWishListsSlice.actions
+export const { AddLISTS,EditLISTS } = allWishListsSlice.actions
 
 export const selectAllWishLists = (state) => state.allWishLists.words;
 

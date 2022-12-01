@@ -19,7 +19,7 @@ import { useSelector, useDispatch } from 'react-redux'
 export default function AddNewWishList() {
   const [open, setOpen] = React.useState(false);
   const [itemName, setitemName] = React.useState('');
-  const [file, setFile] = React.useState();
+  const [file, setFile] = React.useState(null);
   const [brandName, setBrandName] = React.useState('');
   const {enqueueSnackbar}= useSnackbar()
 
@@ -63,7 +63,7 @@ export default function AddNewWishList() {
   };
   const handleChangeFile=(e)=> {
     console.log(e.target.files);
-    setFile(URL.createObjectURL(e.target.files[0]));
+    setFile(e.target.files[0]);
   }
   // const words = useSelector(state => state.load.words);
 
@@ -91,7 +91,7 @@ export default function AddNewWishList() {
     formData.append('item_name',itemName);
     formData.append('brand_name',brandName);
     formData.append('file',file);
-    axios.post("http://localhost:9000/addlist",formData ,{}).then((response) => {
+    axios.post("http://localhost:9000/addlist",formData).then((response) => {
       
       dispatch(AddLISTS(response.data.list))
       console.log(response.data.list)
@@ -111,7 +111,9 @@ export default function AddNewWishList() {
         
       // });
 
-    });
+    }).catch(err => {
+      console.log(err);
+   });;
     setitemName('')
     handleClose()
     console.log(...formData)
@@ -125,14 +127,14 @@ export default function AddNewWishList() {
       
         <DialogTitle sx={DialogStyle}>Add Wish list</DialogTitle>
         <DialogContent sx={DialogStyle}>
-          <form enctype="multipart/form-data">
+          <form onSubmit={handleAdd} enctype="multipart/form-data">
               <p>Item name</p>
               <TextField sx={{background:'#ffff'}} name="item_name" inputRef={valueRef} value={itemName} onChange={handleChange}/>
               <p>Brand name</p>
               <TextField sx={{background:'#ffff'}} name="brand_name" inputRef={valueRef} value={brandName} onChange={handleChangeBrandName}/>
               <p>Upload image</p>
               <input type="file" name="file" accept='image/*' onChange={handleChangeFile}></input>
-              <img src={file}/>
+              {file===null?<img src={file}/>:<img src={URL.createObjectURL(file)}/>} {/* ) */}
           </form>    
         </DialogContent>
         <DialogActions sx={DialogStyle} >

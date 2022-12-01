@@ -49,13 +49,13 @@ export default function BasicCard(props) {
     setExpanded(!expanded);
   };
   const base64String = btoa(String.fromCharCode(...new Uint8Array(props.word.photo.data.data)));
-  console.log(base64String)
+  console.log(base64String.toString("base64"))
   return (
     <Card sx={{ minWidth: 275 }}>
     <CardMedia
         component="img"
         height="300"
-      image={`data:image/png;base64,${base64String}`}
+      image={`data:image/${props.word.photo.contentType};base64,${base64String}`}
         alt=""
       />
       <CardContent>
@@ -68,8 +68,9 @@ export default function BasicCard(props) {
         </Typography>
         
         <Divider />
-        
-        {/* <img src={`data:image/png;base64,${base64String}`} width="500"/> */}
+        {/* <img src="data:image/<%=image.img.contentType%>;base64,
+                     <%=image.img.data.toString('base64')%>"></img> */}
+        {/* <img src={`data:image/${props.word.photo.data.contentType};base64,${props.word.photo.data.toString('base64')}`} /> */}
       </CardContent> 
       <CardActions>
         <EditWishList word={props.word}/>
