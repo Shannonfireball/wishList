@@ -100,7 +100,7 @@ export default function AddNewWishList() {
         const message = 'Success list added';
         enqueueSnackbar(message, { variant: 'success' })
         }else{
-        const messageError = 'Error not list added';
+        const messageError = 'Error list not added';
         enqueueSnackbar(messageError, { variant: 'error' })
       }
 
@@ -113,7 +113,7 @@ export default function AddNewWishList() {
 
     }).catch(err => {
       console.log(err);
-   });;
+   });
     setitemName('')
     handleClose()
     console.log(...formData)
